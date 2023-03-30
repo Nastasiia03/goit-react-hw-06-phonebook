@@ -1,7 +1,9 @@
 import { Formik } from 'formik';
 import { Button, ErrorMessage, Field, Form, FormField } from './ContactForm.styled';
-import { nanoid } from 'nanoid';
-import PropTypes from "prop-types";
+// import { nanoid } from 'nanoid';
+// import PropTypes from "prop-types";
+import { useDispatch } from "react-redux";
+import { addContact } from 'redux/contactsSlice';
 
 function validateName(value) {
    let error;
@@ -23,34 +25,36 @@ function validateName(value) {
    return error;
  }
 
-export const ContactForm = ({onSave}) => {
+export const ContactForm = () => {
+  const dispatch = useDispatch();
+
     return (
     <Formik
-            initialValues={{ name: "", number: "" }}
-            onSubmit={(values, actions) => {
-              onSave({ ...values, id: nanoid(), });
-              actions.resetForm();
+        initialValues={{ name: "", number: "" }}
+        onSubmit={(values, actions) => {
+        dispatch(addContact(values));
+          actions.resetForm();
+          console.log(values)
             }}>
-    {({ errors, touched }) => (
-    <Form>
-        <FormField>
-            Name
-            <Field name="name" type="text" validate={validateName} />
-        {errors.name && touched.name && <ErrorMessage>{errors.name}</ErrorMessage>}
-        </FormField>
-        <FormField>
-            Number
-            <Field name="number" type="tel" validate={validateNumber} />
-        {errors.number && touched.number && <ErrorMessage>{errors.number}</ErrorMessage>}
-        </FormField>
-                    
-        <Button type="submit">Add contact</Button>
+    {({ errors, touched }) => {
+          return (
+            <Form>
+              <FormField>
+                Name
+                <Field name="name" type="text" validate={validateName} />
+                {errors.name && touched.name && <ErrorMessage>{errors.name}</ErrorMessage>}
+              </FormField>
+              <FormField>
+                Number
+                <Field name="number" type="tel" validate={validateNumber} />
+                {errors.number && touched.number && <ErrorMessage>{errors.number}</ErrorMessage>}
+              </FormField>
+
+              <Button type="submit">Add contact</Button>
             </Form>
-            )}
+          );
+        }}
     </Formik>
   )
 }
 
-ContactForm.propTypes = {
-  onSave: PropTypes.func.isRequired,
-}
