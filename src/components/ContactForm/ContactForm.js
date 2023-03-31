@@ -1,9 +1,8 @@
 import { Formik } from 'formik';
 import { Button, ErrorMessage, Field, Form, FormField } from './ContactForm.styled';
-// import { nanoid } from 'nanoid';
-// import PropTypes from "prop-types";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addContact } from 'redux/contactsSlice';
+import { getContacts } from 'redux/selectors';
 
 function validateName(value) {
    let error;
@@ -26,15 +25,22 @@ function validateName(value) {
  }
 
 export const ContactForm = () => {
+  const contacts = useSelector(getContacts);
   const dispatch = useDispatch();
 
     return (
     <Formik
         initialValues={{ name: "", number: "" }}
         onSubmit={(values, actions) => {
-        dispatch(addContact(values));
+          const sameName = contacts.find(contact => contact.name.toLowerCase().includes(values.name.toLowerCase()));
+          if (sameName) {
+            alert(`${values.name} is already in contacts`)
+          } else {
+            dispatch(addContact(values));
+          };
+          
           actions.resetForm();
-          console.log(values)
+         
             }}>
     {({ errors, touched }) => {
           return (
